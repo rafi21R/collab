@@ -1,2 +1,2 @@
 # collab
-collaboration of things 
+working on common project

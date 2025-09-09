@@ -1,175 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Food Delivery Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cat & Mouse Animation Dashboard (Fan‑Made)</title>
   <style>
-    * {margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
-    body {display:flex; min-height:100vh; background:#f8f9fa;}
-    
-    /* Sidebar */
-    .sidebar {
-      width:220px; background:#2d3436; color:#fff; padding:20px; display:flex; flex-direction:column;
+    :root{
+      --bg:#0f1225; --panel:#171a35; --text:#e8ebff; --muted:#aab0d6; --brand:#7c8cff; --accent:#6ae3ff; --ok:#5ee38d; --warn:#ffd36a; --danger:#ff7a7a;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    .sidebar h2 {margin-bottom:30px; text-align:center;}
-    .sidebar a {
-      text-decoration:none; color:#dfe6e9; padding:12px 15px; margin:5px 0; border-radius:8px;
-      display:block; transition:0.3s;
-    }
-    .sidebar a:hover {background:#636e72; color:#fff;}
-    
-    /* Main content */
-    .main {
-      flex:1; padding:20px; overflow-y:auto;
-    }
-    .header {
-      display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;
-    }
-    .header h1 {font-size:24px; color:#2d3436;}
-    .header input {
-      padding:8px 12px; border:1px solid #ccc; border-radius:6px; outline:none;
-    }
-    
-    /* Stats cards */
-    .cards {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px;
-    }
-    .card {
-      background:#fff; padding:20px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.1);
-    }
-    .card h3 {font-size:18px; margin-bottom:10px; color:#636e72;}
-    .card p {font-size:22px; font-weight:bold; color:#2d3436;}
-    
-    /* Table */
-    .table-section {
-      margin-top:30px;
-      background:#fff; padding:20px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.1);
-    }
-    table {width:100%; border-collapse:collapse; margin-top:15px;}
-    th, td {
-      padding:12px; text-align:left; border-bottom:1px solid #eee;
-    }
-    th {background:#f1f2f6; color:#2d3436;}
-    tr:hover {background:#f9f9f9;}
-    
-    /* Button */
-    .btn {
-      padding:8px 15px; border:none; border-radius:6px; cursor:pointer;
-      background:#0984e3; color:#fff; transition:0.3s;
-    }
-    .btn:hover {background:#74b9ff;}
-    
-    @media (max-width: 768px) {
-      .sidebar {width:180px;}
-      .header h1 {font-size:20px;}
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;background:radial-gradient(1200px 600px at 10% -10%, #1b2052 0%, transparent 60%), linear-gradient(180deg,#0b0e20, #0f1225 60%);color:var(--text)}
+
+    /* Layout */
+    .app{display:grid; grid-template-columns:260px 1fr; grid-template-rows:64px 1fr; height:100vh;}
+    header{grid-column:1/3; display:flex; align-items:center; gap:16px; padding:0 18px; backdrop-filter:saturate(140%) blur(10px); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)); border-bottom:1px solid rgba(255,255,255,.08)}
+    header .title{display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.2px}
+    header .badge{font-size:12px; color:#0f1225; background:var(--accent); padding:4px 8px; border-radius:999px}
+    header .spacer{flex:1}
+    header .toolbar{display:flex; gap:10px}
+    header button{background:var(--panel); color:var(--text); border:1px solid rgba(255,255,255,.08); padding:8px 12px; border-radius:12px; cursor:pointer; box-shadow:var(--shadow)}
+
+    aside{border-right:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)); padding:16px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; margin-bottom:18px}
+    .nav{display:flex; flex-direction:column; gap:8px}
+    .nav a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); opacity:.85; padding:10px 12px; border-radius:12px}
+    .nav a.active, .nav a:hover{background:rgba(255,255,255,.06); opacity:1}
+
+    main{padding:18px; overflow:auto}
+    .grid{display:grid; grid-template-columns:2.2fr 1fr; gap:18px}
+
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08); border-radius:18px; box-shadow:var(--shadow)}
+    .panel .head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06)}
+    .panel .head h3{margin:0; font-size:16px; letter-spacing:.3px}
+    .panel .content{padding:16px}
+
+    /* Cards */
+    .cards{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px}
+    .card{background:var(--panel); border:1px solid rgba(255,255,255,.08); padding:14px; border-radius:16px; box-shadow:var(--shadow)}
+    .card .label{font-size:12px; color:var(--muted)}
+    .card .value{font-size:26px; font-weight:800; margin-top:6px}
+
+    /* Animation stage */
+    #stageWrapper{position:relative; height:420px}
+    #stage{width:100%; height:100%; display:block; background:radial-gradient(800px 240px at 50% 95%, rgba(122,138,255,.18), transparent 60%), linear-gradient(180deg, #0e132e, #0b0f26 60%); border-radius:14px}
+    .controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+    .controls .group{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.05); padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08)}
+    .controls label{font-size:12px; color:var(--muted)}
+    .controls input[type=range]{width:160px}
+
+    /* Logs */
+    .log{max-height:340px; overflow:auto; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+    .log .item{padding:10px 12px; border-bottom:1px dashed rgba(255,255,255,.08)}
+
+    /* Responsive */
+    @media (max-width: 1100px){ .grid{grid-template-columns:1fr} .cards{grid-template-columns:repeat(2,1fr)} .app{grid-template-columns:1fr} aside{display:none} }
+
+    /* Tooltip */
+    .tip{font-size:12px; color:var(--muted)}
+
+    /* Footer */
+    footer{padding:12px 18px; font-size:12px; color:var(--muted)}
   </style>
 </head>
 <body>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>🍔 FoodDash</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Orders</a>
-    <a href="#">Customers</a>
-    <a href="#">Menu</a>
-    <a href="#">Settings</a>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main">
-    <div class="header">
-      <h1>Dashboard</h1>
-      <input type="text" id="search" placeholder="Search orders...">
-    </div>
-
-    <!-- Stats -->
-    <div class="cards">
-      <div class="card">
-        <h3>Total Orders</h3>
-        <p id="totalOrders">120</p>
+  <div class="app">
+    <header>
+      <div class="title">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2c3 0 5 2 6 4 3 0 5 2 5 5s-2 5-5 5h-1c-1 2-3 4-5 4s-4-2-5-4H6C3 16 1 14 1 11s2-5 5-5c1-2 3-4 6-4Z" fill="currentColor" opacity=".9"/>
+        </svg>
+        <span>Cat & Mouse Animation Dashboard</span>
+        <span class="badge">Fan‑made • No IP assets</span>
       </div>
-      <div class="card">
-        <h3>Revenue</h3>
-        <p>$3,450</p>
+      <div class="spacer"></div>
+      <div class="toolbar">
+        <button id="toggleTheme" title="Toggle theme">🌗 Theme</button>
+        <button id="resetStats" title="Reset stats">♻️ Reset</button>
+        <button id="savePNG" title="Save frame as PNG">🖼️ Snapshot</button>
       </div>
-      <div class="card">
-        <h3>Active Customers</h3>
-        <p>89</p>
-      </div>
-      <div class="card">
-        <h3>Pending Orders</h3>
-        <p id="pendingOrders">7</p>
-      </div>
-    </div>
+    </header>
 
-    <!-- Table -->
-    <div class="table-section">
-      <h2>Recent Orders</h2>
-      <table id="ordersTable">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Food Item</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>#1001</td>
-            <td>John Doe</td>
-            <td>Burger</td>
-            <td><span style="color:orange;">Pending</span></td>
-            <td><button class="btn" onclick="completeOrder(this)">Complete</button></td>
-          </tr>
-          <tr>
-            <td>#1002</td>
-            <td>Sarah Smith</td>
-            <td>Pizza</td>
-            <td><span style="color:green;">Completed</span></td>
-            <td><button class="btn" disabled>Done</button></td>
-          </tr>
-          <tr>
-            <td>#1003</td>
-            <td>Mike Johnson</td>
-            <td>Pasta</td>
-            <td><span style="color:orange;">Pending</span></td>
-            <td><button class="btn" onclick="completeOrder(this)">Complete</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <aside>
+      <div class="brand">📺 Dashboard</div>
+      <nav class="nav">
+        <a class="active" href="#">Animation</a>
+        <a href="#stats">Statistics</a>
+        <a href="#events">Events Log</a>
+        <a href="#about">About</a>
+      </nav>
+      <p class="tip" style="margin-top:12px">This is an original cat‑and‑mouse chase animation inspired by classic slapstick. No copyrighted characters, images, or audio are used.</p>
+    </aside>
+
+    <main>
+      <!-- Cards -->
+      <section class="cards" id="stats">
+        <div class="card"><div class="label">Total Chases</div><div class="value" id="statChases">0</div></div>
+        <div class="card"><div class="label">Catches</div><div class="value" id="statCatches">0</div></div>
+        <div class="card"><div class="label">Avg. Speed</div><div class="value" id="statSpeed">1.0x</div></div>
+        <div class="card"><div class="label">Run Time</div><div class="value" id="statUptime">0:00</div></div>
+      </section>
+
+      <div class="grid">
+        <!-- Animation Panel -->
+        <section class="panel" id="animationPanel">
+          <div class="head">
+            <h3>Chase Stage</h3>
+            <div class="controls">
+              <div class="group">
+                <button id="playPause">▶️ Play</button>
+                <button id="restart">🔁 Restart</button>
+              </div>
+              <div class="group">
+                <label for="speed">Speed</label>
+                <input id="speed" type="range" min="0.2" max="3" step="0.1" value="1"/>
+                <span id="speedVal">1.0x</span>
+              </div>
+              <div class="group">
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty">
+                  <option value="easy">Easy</option>
+                  <option value="normal" selected>Normal</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="content">
+            <div id="stageWrapper">
+              <svg id="stage" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid slice">
+                <!-- Floor -->
+                <rect x="0" y="340" width="1000" height="80" fill="rgba(255,255,255,.06)"/>
+                <!-- Path -->
+                <path id="track" d="M40,360 C200,260 320,260 480,360 S760,460 940,360" stroke="rgba(255,255,255,.25)" stroke-width="3" fill="transparent" stroke-dasharray="6 8"/>
+
+                <!-- Mouse (circle + ears) -->
+                <g id="mouse" transform="translate(60,360)">
+                  <circle cx="0" cy="0" r="12" fill="#E6E9FF" />
+                  <circle cx="-8" cy="-10" r="5" fill="#E6E9FF" />
+                  <circle cx="8" cy="-10" r="5" fill="#E6E9FF" />
+                  <circle cx="-10" cy="-12" r="2" fill="#c7ccff" />
+                  <circle cx="10" cy="-12" r="2" fill="#c7ccff" />
+                  <circle cx="4" cy="-2" r="2" fill="#0f1225" />
+                  <line x1="12" y1="2" x2="22" y2="0" stroke="#E6E9FF" stroke-width="2" stroke-linecap="round"/>
+                </g>
+
+                <!-- Cat (body + ears + tail) -->
+                <g id="cat" transform="translate(20,360)">
+                  <ellipse cx="0" cy="0" rx="16" ry="12" fill="#9fb0ff"/>
+                  <polygon points="-8,-12 -2,-22 4,-12" fill="#9fb0ff"/>
+                  <polygon points="8,-12 14,-22 20,-12" fill="#9fb0ff"/>
+                  <circle cx="-4" cy="-4" r="2" fill="#0f1225"/>
+                  <line x1="-16" y1="-2" x2="-28" y2="-8" stroke="#9fb0ff" stroke-width="3" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </div>
+            <div class="tip" style="margin-top:8px">Use Play ▶️, adjust Speed, and watch the chase. When the cat gets close enough, it's a "catch" and a new round starts.</div>
+          </div>
+        </section>
+
+        <!-- Side panels -->
+        <section class="panel">
+          <div class="head"><h3>Chase Metrics</h3></div>
+          <div class="content">
+            <canvas id="chart" width="640" height="280" style="width:100%; height:auto; background:rgba(255,255,255,.04); border-radius:12px; border:1px solid rgba(255,255,255,.08)"></canvas>
+            <div class="tip" style="margin-top:8px">Catches per minute over the current session.</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Events Log -->
+      <section class="panel" style="margin-top:18px" id="events">
+        <div class="head"><h3>Events Log</h3>
+          <div class="controls"><div class="group"><button id="clearLog">🧹 Clear Log</button></div></div>
+        </div>
+        <div class="content log" id="log"></div>
+      </section>
+
+      <!-- About -->
+      <section class="panel" style="margin-top:18px" id="about">
+        <div class="head"><h3>About this demo</h3></div>
+        <div class="content">
+          <p>This single‑file web app is a playful, original cat‑and‑mouse chase dashboard. It does not use or reproduce trademarked characters or copyrighted media. Everything here (shapes, motion, UI) is coded with HTML, CSS, and vanilla JavaScript.</p>
+        </div>
+      </section>
+
+      <footer>© 2025 Demo. Fan‑made homage to classic slapstick. No affiliation with existing franchises.
+      </footer>
+    </main>
   </div>
 
   <script>
-    // Mark order as completed
-    function completeOrder(btn) {
-      let row = btn.closest("tr");
-      let statusCell = row.cells[3];
-      statusCell.innerHTML = '<span style="color:green;">Completed</span>';
-      btn.innerText = "Done";
-      btn.disabled = true;
-
-      // Update pending count
-      let pending = document.querySelectorAll("#ordersTable tbody tr td:nth-child(4) span");
-      let count = 0;
-      pending.forEach(s => { if(s.innerText === "Pending") count++; });
-      document.getElementById("pendingOrders").innerText = count;
+    // --- Utilities ---
+    const $ = sel => document.querySelector(sel);
+    const logEl = $('#log');
+    function log(msg){
+      const t = new Date();
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.textContent = `[${t.toLocaleTimeString()}] ${msg}`;
+      logEl.prepend(item);
     }
 
-    // Search filter
-    document.getElementById("search").addEventListener("keyup", function(){
-      let filter = this.value.toLowerCase();
-      let rows = document.querySelectorAll("#ordersTable tbody tr");
-      rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
+    // --- Persistent Stats ---
+    const store = {
+      get(){
+        try{ return JSON.parse(localStorage.getItem('catMouseStats')||'{}'); }catch(e){return{}};
+      },
+      set(data){ localStorage.setItem('catMouseStats', JSON.stringify(data)); }
+    };
+
+    const stats = Object.assign({ chases:0, catches:0, speed:1, started: Date.now(), series:[] }, store.get());
+
+    // --- UI Elements ---
+    const statChases = $('#statChases');
+    const statCatches = $('#statCatches');
+    const statSpeed = $('#statSpeed');
+    const statUptime = $('#statUptime');
+    const speed = $('#speed');
+    const speedVal = $('#speedVal');
+    const playPause = $('#playPause');
+    const restartBtn = $('#restart');
+    const difficulty = $('#difficulty');
+    const resetStatsBtn = $('#resetStats');
+    const clearLogBtn = $('#clearLog');
+    const toggleThemeBtn = $('#toggleTheme');
+    const savePNGBtn = $('#savePNG');
+
+    function renderStats(){
+      statChases.textContent = stats.chases;
+      statCatches.textContent = stats.catches;
+      statSpeed.textContent = `${Number(stats.speed).toFixed(1)}x`;
+    }
+
+    // Uptime
+    function updateUptime(){
+      const sec = Math.floor((Date.now()-stats.started)/1000);
+      const m = Math.floor(sec/60).toString();
+      const s = (sec%60).toString().padStart(2,'0');
+      statUptime.textContent = `${m}:${s}`;
+    }
+    setInterval(updateUptime, 500);
+
+    // --- Chart (simple canvas line) ---
+    const chart = document.getElementById('chart');
+    const ctx = chart.getContext('2d');
+    function drawChart(){
+      const w = chart.width, h = chart.height;
+      ctx.clearRect(0,0,w,h);
+      // frame
+      ctx.globalAlpha = 1; ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.strokeRect(40,20,w-60,h-60);
+      // axes labels
+      ctx.font = '12px ui-sans-serif, system-ui'; ctx.fillStyle='rgba(255,255,255,0.7)';
+      ctx.fillText('Catches/min', 10, 14);
+      // data
+      const data = stats.series.slice(-60); // last 60 mins
+      const max = Math.max(3, ...data.map(d=>d.v));
+      const x0 = 50, y0 = h-50, x1 = w-30, y1 = 30;
+      const dx = (x1-x0) / Math.max(1,data.length-1);
+      ctx.beginPath();
+      data.forEach((d,i)=>{
+        const x = x0 + i*dx;
+        const y = y0 - (d.v/max)*(y0-y1);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       });
+      ctx.strokeStyle = 'rgba(122, 227, 255, 0.9)';
+      ctx.lineWidth = 2; ctx.stroke();
+      // grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      for(let i=0;i<=5;i++){
+        const y = y0 - i*(y0-y1)/5;
+        ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+      }
+    }
+
+    // update chart every minute
+    setInterval(()=>{
+      const now = Date.now();
+      const last = stats.series.at(-1);
+      const minute = 60000;
+      if(!last || now - last.t >= minute){
+        stats.series.push({t:now, v: sessionCatches});
+        sessionCatches = 0; // reset per minute counter
+        store.set(stats); drawChart();
+      }
+    }, 1000);
+
+    // --- SVG Path Animation ---
+    const svg = document.getElementById('stage');
+    const track = document.getElementById('track');
+    const cat = document.getElementById('cat');
+    const mouse = document.getElementById('mouse');
+
+    const path = track; // SVGPathElement
+    const pathLen = path.getTotalLength();
+
+    let tCat = 0.0;    // 0..1 position along path
+    let tMouse = 0.08; // mouse slightly ahead
+    let running = false;
+    let lastTs = 0;
+    let sessionCatches = 0;
+
+    function setTransform(g, pt){ g.setAttribute('transform', `translate(${pt.x.toFixed(2)}, ${pt.y.toFixed(2)})`); }
+
+    function step(ts){
+      if(!running){ lastTs = ts; return; }
+      const dt = Math.min(0.05, (ts - lastTs)/1000 || 0); // seconds
+      lastTs = ts;
+
+      // difficulty affects gap & speeds
+      const diff = difficulty.value;
+      const baseMouse = 0.12; // per second in path t units
+      const baseCat = 0.10;
+      const mult = Number(speed.value);
+      let mouseV = baseMouse * mult;
+      let catV = baseCat * mult;
+      if(diff==='easy'){ catV *= 0.95; }
+      if(diff==='hard'){ catV *= 1.15; }
+
+      tMouse = (tMouse + mouseV * dt) % 1;
+      // Cat tries to close gap
+      const gap = (tMouse - tCat + 1) % 1; // 0..1 forward distance
+      const pursuitBoost = Math.min(0.08, gap*0.2);
+      tCat = (tCat + (catV + pursuitBoost) * dt) % 1;
+
+      const pMouse = path.getPointAtLength(tMouse * pathLen);
+      const pCat   = path.getPointAtLength(tCat * pathLen);
+      setTransform(mouse, pMouse);
+      setTransform(cat, pCat);
+
+      // catch event
+      const dx = pMouse.x - pCat.x, dy = pMouse.y - pCat.y;
+      const dist = Math.hypot(dx,dy);
+      const threshold = 24; // catch radius
+      if(dist < threshold){
+        stats.catches += 1; sessionCatches += 1; renderStats();
+        log('🎉 Catch! New round begins.');
+        // reset with a new head start
+        tCat = Math.random()*0.05; tMouse = (tCat + 0.10 + Math.random()*0.05) % 1;
+        store.set(stats); drawChart();
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function start(){
+      if(!running){ running = true; playPause.textContent = '⏸️ Pause'; requestAnimationFrame(step); log('▶️ Play'); }
+    }
+    function pause(){ running = false; playPause.textContent = '▶️ Play'; log('⏸️ Pause'); }
+    function restart(){ tCat = 0; tMouse = 0.08; stats.chases += 1; renderStats(); log('🔁 Restarted chase'); store.set(stats); }
+
+    // --- Controls wiring ---
+    playPause.addEventListener('click', ()=> running ? pause() : start());
+    restartBtn.addEventListener('click', restart);
+    speed.addEventListener('input', ()=>{ stats.speed = Number(speed.value); speedVal.textContent = `${stats.speed.toFixed(1)}x`; statSpeed.textContent = `${stats.speed.toFixed(1)}x`; store.set(stats); });
+    difficulty.addEventListener('change', ()=> log(`Difficulty: ${difficulty.value}`));
+    resetStatsBtn.addEventListener('click', ()=>{ Object.assign(stats,{ chases:0, catches:0, speed:Number(speed.value), started: Date.now(), series:[] }); store.set(stats); renderStats(); drawChart(); log('♻️ Stats reset'); });
+    clearLogBtn.addEventListener('click', ()=>{ logEl.innerHTML=''; log('🧹 Log cleared'); });
+
+    // Theme toggle (simple inversion)
+    toggleThemeBtn.addEventListener('click', ()=>{
+      const isLight = document.body.dataset.theme === 'light';
+      if(isLight){ delete document.body.dataset.theme; document.documentElement.style.filter = ''; }
+      else { document.body.dataset.theme = 'light'; document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)'; }
     });
+
+    // Snapshot current SVG to PNG
+    savePNGBtn.addEventListener('click', ()=>{
+      const svgEl = document.getElementById('stage');
+      const xml = new XMLSerializer().serializeToString(svgEl);
+      const svg64 = btoa(unescape(encodeURIComponent(xml)));
+      const img = new Image();
+      img.onload = function(){
+        const c = document.createElement('canvas');
+        c.width = svgEl.clientWidth * 2; c.height = svgEl.clientHeight * 2;
+        const cx = c.getContext('2d');
+        cx.scale(2,2); cx.drawImage(img,0,0, svgEl.clientWidth, svgEl.clientHeight);
+        const url = c.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.download = `cat-mouse-frame-${Date.now()}.png`;
+        a.href = url; a.click();
+      };
+      img.src = 'data:image/svg+xml;base64,' + svg64;
+    });
+
+    // kick things off
+    function boot(){
+      speed.value = stats.speed ?? 1; speed.dispatchEvent(new Event('input'));
+      renderStats(); drawChart(); updateUptime();
+      log('✅ Ready. Click ▶️ Play to start.');
+    }
+    boot();
   </script>
 </body>
 </html>

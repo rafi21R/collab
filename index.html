@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Food Delivery Dashboard</title>
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
+    body {display:flex; min-height:100vh; background:#f8f9fa;}
+    
+    /* Sidebar */
+    .sidebar {
+      width:220px; background:#2d3436; color:#fff; padding:20px; display:flex; flex-direction:column;
+    }
+    .sidebar h2 {margin-bottom:30px; text-align:center;}
+    .sidebar a {
+      text-decoration:none; color:#dfe6e9; padding:12px 15px; margin:5px 0; border-radius:8px;
+      display:block; transition:0.3s;
+    }
+    .sidebar a:hover {background:#636e72; color:#fff;}
+    
+    /* Main content */
+    .main {
+      flex:1; padding:20px; overflow-y:auto;
+    }
+    .header {
+      display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;
+    }
+    .header h1 {font-size:24px; color:#2d3436;}
+    .header input {
+      padding:8px 12px; border:1px solid #ccc; border-radius:6px; outline:none;
+    }
+    
+    /* Stats cards */
+    .cards {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px;
+    }
+    .card {
+      background:#fff; padding:20px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.1);
+    }
+    .card h3 {font-size:18px; margin-bottom:10px; color:#636e72;}
+    .card p {font-size:22px; font-weight:bold; color:#2d3436;}
+    
+    /* Table */
+    .table-section {
+      margin-top:30px;
+      background:#fff; padding:20px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.1);
+    }
+    table {width:100%; border-collapse:collapse; margin-top:15px;}
+    th, td {
+      padding:12px; text-align:left; border-bottom:1px solid #eee;
+    }
+    th {background:#f1f2f6; color:#2d3436;}
+    tr:hover {background:#f9f9f9;}
+    
+    /* Button */
+    .btn {
+      padding:8px 15px; border:none; border-radius:6px; cursor:pointer;
+      background:#0984e3; color:#fff; transition:0.3s;
+    }
+    .btn:hover {background:#74b9ff;}
+    
+    @media (max-width: 768px) {
+      .sidebar {width:180px;}
+      .header h1 {font-size:20px;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🍔 FoodDash</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Orders</a>
+    <a href="#">Customers</a>
+    <a href="#">Menu</a>
+    <a href="#">Settings</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="header">
+      <h1>Dashboard</h1>
+      <input type="text" id="search" placeholder="Search orders...">
+    </div>
+
+    <!-- Stats -->
+    <div class="cards">
+      <div class="card">
+        <h3>Total Orders</h3>
+        <p id="totalOrders">120</p>
+      </div>
+      <div class="card">
+        <h3>Revenue</h3>
+        <p>$3,450</p>
+      </div>
+      <div class="card">
+        <h3>Active Customers</h3>
+        <p>89</p>
+      </div>
+      <div class="card">
+        <h3>Pending Orders</h3>
+        <p id="pendingOrders">7</p>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-section">
+      <h2>Recent Orders</h2>
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Food Item</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#1001</td>
+            <td>John Doe</td>
+            <td>Burger</td>
+            <td><span style="color:orange;">Pending</span></td>
+            <td><button class="btn" onclick="completeOrder(this)">Complete</button></td>
+          </tr>
+          <tr>
+            <td>#1002</td>
+            <td>Sarah Smith</td>
+            <td>Pizza</td>
+            <td><span style="color:green;">Completed</span></td>
+            <td><button class="btn" disabled>Done</button></td>
+          </tr>
+          <tr>
+            <td>#1003</td>
+            <td>Mike Johnson</td>
+            <td>Pasta</td>
+            <td><span style="color:orange;">Pending</span></td>
+            <td><button class="btn" onclick="completeOrder(this)">Complete</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Mark order as completed
+    function completeOrder(btn) {
+      let row = btn.closest("tr");
+      let statusCell = row.cells[3];
+      statusCell.innerHTML = '<span style="color:green;">Completed</span>';
+      btn.innerText = "Done";
+      btn.disabled = true;
+
+      // Update pending count
+      let pending = document.querySelectorAll("#ordersTable tbody tr td:nth-child(4) span");
+      let count = 0;
+      pending.forEach(s => { if(s.innerText === "Pending") count++; });
+      document.getElementById("pendingOrders").innerText = count;
+    }
+
+    // Search filter
+    document.getElementById("search").addEventListener("keyup", function(){
+      let filter = this.value.toLowerCase();
+      let rows = document.querySelectorAll("#ordersTable tbody tr");
+      rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>

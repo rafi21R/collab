@@ -1,153 +1,242 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Movie Recommendations</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Movie Recommendations Dashboard</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #121212;
-      color: #f5f5f5;
-    }
+    /* Reset + base */
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial;color:#eef2f7;background:#071426;overflow-y:auto}
 
-    header {
-      padding: 20px;
-      background: #1e1e1e;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    }
+    /* Background animated blobs */
+    .bg-anim{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.55;animation:float 12s ease-in-out infinite}
+    .blob.a{width:520px;height:520px;background:linear-gradient(135deg,#ff7a88,#ffb199);left:-8%;top:6%;animation-duration:20s}
+    .blob.b{width:420px;height:420px;background:linear-gradient(135deg,#6be7ff,#6b8bff);right:-6%;top:30%;animation-duration:18s}
+    .blob.c{width:360px;height:360px;background:linear-gradient(135deg,#8affc1,#6bffb3);left:15%;bottom:-10%;animation-duration:22s}
+    @keyframes float{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.05)}100%{transform:translateY(0) scale(1)}}
 
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-      color: #ffcc00;
-    }
+    /* App container */
+    .app{position:relative;z-index:1;max-width:1200px;margin:32px auto;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);border-radius:12px;box-shadow:0 10px 40px rgba(2,6,23,0.6)}
 
-    .search-container {
-      margin: 20px auto;
-      max-width: 600px;
-      display: flex;
-      gap: 10px;
-    }
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#6be7ff,#6b8bff);display:flex;align-items:center;justify-content:center;color:#062036;font-weight:700;font-size:20px}
+    h1{margin:0;font-size:20px;color:#e6f2ff}
+    p.lead{margin:0;color:#a8c0d9}
 
-    .search-container input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      outline: none;
-      font-size: 1rem;
-    }
+    .controls{display:flex;gap:12px;align-items:center}
+    .search{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.01);color:#e6f2ff;min-width:260px}
+    .select,.chip{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;color:#e6f2ff}
 
-    .search-container button {
-      padding: 12px 20px;
-      background: #ffcc00;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+    /* Genres list */
+    .genres{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+    .genre{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:#a8c0d9}
+    .genre.active{background:linear-gradient(90deg,#6be7ff33,#8affc133);color:#06324b;border-color:transparent}
 
-    .search-container button:hover {
-      background: #e6b800;
-    }
+    /* Movie grid */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+    .card:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(2,6,23,0.6)}
+    .poster{width:100%;height:260px;object-fit:cover;display:block}
+    .meta{padding:10px}
+    .title{font-weight:700;color:#e9fbff;margin:0 0 6px;font-size:14px}
+    .sub{font-size:12px;color:#9fb6cf;margin:0}
 
-    .movies-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
+    /* Modal */
+    .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(6px)}
+    .modal{width:min(900px,96%);background:linear-gradient(180deg,#0b2740,#062036);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);display:flex;gap:18px}
+    .modal .left{flex:0 0 250px}
+    .modal .left img{width:100%;height:360px;object-fit:cover;border-radius:8px}
+    .modal .right{flex:1;color:#cfe9fb}
+    .modal .right h2{margin-top:0}
+    .close-btn{background:transparent;border:0;color:#9fb6cf;font-size:18px;cursor:pointer}
 
-    .movie-card {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      transition: transform 0.2s;
-    }
+    /* small footer */
+    footer{margin-top:18px;color:#7ea0bf;font-size:13px;text-align:right}
 
-    .movie-card:hover {
-      transform: scale(1.05);
-    }
-
-    .movie-card img {
-      width: 100%;
-      border-radius: 10px;
-    }
-
-    .movie-card h3 {
-      margin: 10px 0 5px;
-      font-size: 1.2rem;
-      color: #ffcc00;
-    }
-
-    .movie-card p {
-      font-size: 0.9rem;
-      color: #ccc;
-    }
+    /* responsive */
+    @media (max-width:720px){.modal{flex-direction:column}.modal .left img{height:280px}}
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎬 Movie Recommendations</h1>
-  </header>
-
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search a movie...">
-    <button onclick="searchMovies()">Search</button>
+  <div class="bg-anim" aria-hidden>
+    <div class="blob a"></div>
+    <div class="blob b"></div>
+    <div class="blob c"></div>
   </div>
 
-  <section class="movies-grid" id="moviesGrid">
-    <!-- Movie recommendations will appear here -->
-  </section>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">MR</div>
+        <div>
+          <h1>Movie Recommendations</h1>
+          <p class="lead">Discover films across categories & genres — curated for you.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" class="search" placeholder="Search movies, actors, or keywords..." />
+        <select id="categoryFilter" class="select">
+          <option value="all">All Categories</option>
+          <option value="popular">Popular</option>
+          <option value="new">New Releases</option>
+          <option value="classic">Classics</option>
+          <option value="hidden-gems">Hidden Gems</option>
+        </select>
+      </div>
+    </header>
+
+    <nav class="genres" id="genres"></nav>
+
+    <section class="grid" id="grid"></section>
+
+    <footer>Built with ❤️ — Single-file HTML/CSS/JS dashboard</footer>
+  </main>
+
+  <!-- Modal template -->
+  <template id="modalT">
+    <div class="modal-back">
+      <div class="modal">
+        <div class="left"><img src="" alt="poster" /></div>
+        <div class="right">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2></h2>
+            <button class="close-btn">✕</button>
+          </div>
+          <p class="sub"></p>
+          <p style="margin-top:12px;line-height:1.5" class="desc"></p>
+        </div>
+      </div>
+    </div>
+  </template>
 
   <script>
-    // Sample movie dataset
+    // === Data ===
+    // 36 movies with genre tags, category and short description. Images use picsum.photos seeds for unique posters.
     const movies = [
-      { title: "Inception", genre: "Sci-Fi", img: "https://m.media-amazon.com/images/I/51zUbui+gbL._AC_.jpg" },
-      { title: "The Dark Knight", genre: "Action", img: "https://m.media-amazon.com/images/I/51O5PvY9COL._AC_.jpg" },
-      { title: "Interstellar", genre: "Sci-Fi", img: "https://m.media-amazon.com/images/I/71n58xD1uvL._AC_SL1024_.jpg" },
-      { title: "Parasite", genre: "Thriller", img: "https://m.media-amazon.com/images/I/91of9cJLdNL._AC_SL1500_.jpg" },
-      { title: "Avengers: Endgame", genre: "Superhero", img: "https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_SL1500_.jpg" },
-      { title: "Joker", genre: "Drama", img: "https://m.media-amazon.com/images/I/81xQO0U6R9L._AC_SL1500_.jpg" },
-      { title: "Coco", genre: "Animation", img: "https://m.media-amazon.com/images/I/91s9MLD7wcL._AC_SL1500_.jpg" },
-      { title: "Titanic", genre: "Romance", img: "https://m.media-amazon.com/images/I/71wV3bGpM0L._AC_SL1024_.jpg" },
+      {id:1,title:'The Last Sunrise',genres:['Drama','Romance'],category:'popular',year:2022,desc:'A touching tale about second chances and the cost of silence.',img:'https://picsum.photos/seed/movie1/420/620'},
+      {id:2,title:'Neon Alley',genres:['Action','Crime'],category:'popular',year:2021,desc:'A fast-paced neo-noir following a courier who uncovers a city-wide conspiracy.',img:'https://picsum.photos/seed/movie2/420/620'},
+      {id:3,title:'Starlight Cove',genres:['Fantasy','Adventure'],category:'hidden-gems',year:2019,desc:'Children on holiday discover a secret that bends time and memory.',img:'https://picsum.photos/seed/movie3/420/620'},
+      {id:4,title:'Quiet Composition',genres:['Drama'],category:'classic',year:1998,desc:'An intimate portrait of a composer reconciling with his estranged daughter.',img:'https://picsum.photos/seed/movie4/420/620'},
+      {id:5,title:'Binary Heist',genres:['Sci-Fi','Thriller'],category:'new',year:2024,desc:'When an AI bank goes rogue, a hacker-team must break the unbreakable.',img:'https://picsum.photos/seed/movie5/420/620'},
+      {id:6,title:'Waves of August',genres:['Romance','Drama'],category:'hidden-gems',year:2016,desc:'Two strangers share a week-long summer by the sea and alter each other’s lives.',img:'https://picsum.photos/seed/movie6/420/620'},
+      {id:7,title:'Crimson Blade',genres:['Action','Fantasy'],category:'popular',year:2020,desc:'A warrior with a cursed sword fights to free her homeland.',img:'https://picsum.photos/seed/movie7/420/620'},
+      {id:8,title:'Cafe at Midnight',genres:['Comedy','Romance'],category:'classic',year:2004,desc:'A low-key romantic comedy where overheard conversations lead to love.',img:'https://picsum.photos/seed/movie8/420/620'},
+      {id:9,title:'Orbit 9',genres:['Sci-Fi','Drama'],category:'new',year:2023,desc:'A stranded astronaut confronts isolation, memory and what home means.',img:'https://picsum.photos/seed/movie9/420/620'},
+      {id:10,title:'Paper Lanterns',genres:['Mystery','Drama'],category:'hidden-gems',year:2015,desc:'A small-town secret unravels when a journalist returns for a funeral.',img:'https://picsum.photos/seed/movie10/420/620'},
+      {id:11,title:'Midnight Runner',genres:['Thriller','Crime'],category:'popular',year:2018,desc:'A courier chased by every faction in the city races to clear her name.',img:'https://picsum.photos/seed/movie11/420/620'},
+      {id:12,title:'Blue Kite',genres:['Animation','Family'],category:'classic',year:2001,desc:'A heartwarming animated journey of a boy and his kite who find courage.',img:'https://picsum.photos/seed/movie12/420/620'},
+      {id:13,title:'Echoes of Silence',genres:['Horror','Mystery'],category:'classic',year:1995,desc:'A haunting film about a house that remembers the voices of its past.',img:'https://picsum.photos/seed/movie13/420/620'},
+      {id:14,title:'Tomorrow City',genres:['Sci-Fi','Action'],category:'new',year:2024,desc:'A megacity on the brink of collapse — one cop’s choices may change its fate.',img:'https://picsum.photos/seed/movie14/420/620'},
+      {id:15,title:'The Florist',genres:['Romance','Comedy'],category:'hidden-gems',year:2017,desc:'A florist and a bookstore owner trade bouquets and secrets that blossom into love.',img:'https://picsum.photos/seed/movie15/420/620'},
+      {id:16,title:'The Archivist',genres:['Drama','Mystery'],category:'popular',year:2013,desc:'A records keeper discovers a file that will alter the nation’s history.',img:'https://picsum.photos/seed/movie16/420/620'},
+      {id:17,title:'Glass Harbor',genres:['Crime','Drama'],category:'classic',year:1999,desc:'A hardboiled story about loyalty, regret, and a harbor that hides more than ships.',img:'https://picsum.photos/seed/movie17/420/620'},
+      {id:18,title:'Luminous',genres:['Documentary'],category:'hidden-gems',year:2020,desc:'An intimate documentary exploring light pollution and nightscape photography.',img:'https://picsum.photos/seed/movie18/420/620'},
+      {id:19,title:'Pocket Universe',genres:['Sci-Fi','Comedy'],category:'new',year:2025,desc:'Two roommates accidentally shrink their apartment into a micro-universe.',img:'https://picsum.photos/seed/movie19/420/620'},
+      {id:20,title:'Rust & Roses',genres:['Drama','Historical'],category:'classic',year:1978,desc:'A layered story spanning generations in an industrial town.',img:'https://picsum.photos/seed/movie20/420/620'},
+      {id:21,title:'Glasswing',genres:['Fantasy','Mystery'],category:'hidden-gems',year:2014,desc:'A cartographer charts a map that alters reality when folded correctly.',img:'https://picsum.photos/seed/movie21/420/620'},
+      {id:22,title:'Station Eleven',genres:['Drama','Sci-Fi'],category:'popular',year:2021,desc:'Communities rebuild after collapse; art becomes the language of survival.',img:'https://picsum.photos/seed/movie22/420/620'},
+      {id:23,title:'High Tide Heist',genres:['Action','Comedy'],category:'popular',year:2019,desc:'A bungled heist at sea mixes slapstick with surprising heart.',img:'https://picsum.photos/seed/movie23/420/620'},
+      {id:24,title:'Portraits in Rain',genres:['Romance','Drama'],category:'classic',year:2006,desc:'A struggling artist captures strangers in the rain and paints their stories.',img:'https://picsum.photos/seed/movie24/420/620'},
+      {id:25,title:'Silicon Orchard',genres:['Sci-Fi','Drama'],category:'new',year:2024,desc:'Tech founders face the moral cost of abundance in a near future valley.',img:'https://picsum.photos/seed/movie25/420/620'},
+      {id:26,title:'The Long Way Home',genres:['Adventure','Drama'],category:'hidden-gems',year:2012,desc:'A cross-country trek reconnects a family separated by years of silence.',img:'https://picsum.photos/seed/movie26/420/620'},
+      {id:27,title:'Paper Planes',genres:['Family','Comedy'],category:'classic',year:2010,desc:'Kids launch a school-wide paper plane contest and learn about teamwork.',img:'https://picsum.photos/seed/movie27/420/620'},
+      {id:28,title:'Midnight Mechanics',genres:['Action','Sci-Fi'],category:'popular',year:2020,desc:'Mechanics mod cars that run on ideas — and a thief steals one that thinks.',img:'https://picsum.photos/seed/movie28/420/620'},
+      {id:29,title:'The Poet's Fold',genres:['Drama','Romance'],category:'hidden-gems',year:2011,desc:'An unlikely friendship between a postman and a poet grows into something more.',img:'https://picsum.photos/seed/movie29/420/620'},
+      {id:30,title:'Neptune's Call',genres:['Adventure','Fantasy'],category:'new',year:2023,desc:'Divers find a submerged city and must choose whether to reveal it.',img:'https://picsum.photos/seed/movie30/420/620'},
+      {id:31,title:'Afterimage',genres:['Horror','Thriller'],category:'popular',year:2017,desc:'A photographer develops film that traps glimpses of nightmares.',img:'https://picsum.photos/seed/movie31/420/620'},
+      {id:32,title:'The Debt of Stars',genres:['Sci-Fi','Drama'],category:'classic',year:1986,desc:'An astronaut returns decades later to a changed Earth and forgotten debts.',img:'https://picsum.photos/seed/movie32/420/620'},
+      {id:33,title:'Velvet Echo',genres:['Mystery','Thriller'],category:'hidden-gems',year:2018,desc:'A jazz singer becomes entangled in the disappearance of her producer.',img:'https://picsum.photos/seed/movie33/420/620'},
+      {id:34,title:'Glass & Glass',genres:['Documentary','Drama'],category:'hidden-gems',year:2019,desc:'Exploring communities that build artistry out of recycled glass.',img:'https://picsum.photos/seed/movie34/420/620'},
+      {id:35,title:'The Clocksmith',genres:['Fantasy','Drama'],category:'classic',year:2002,desc:'A clockmaker crafts timepieces that mend broken memories.',img:'https://picsum.photos/seed/movie35/420/620'},
+      {id:36,title:'Lanterns in June',genres:['Romance','Drama'],category:'popular',year:2021,desc:'Two coworkers re-discover wonder during a city-wide lantern festival.',img:'https://picsum.photos/seed/movie36/420/620'}
     ];
 
-    const grid = document.getElementById("moviesGrid");
+    // Derive unique genres
+    const allGenres = Array.from(new Set(movies.flatMap(m=>m.genres))).sort();
 
-    // Display all movies by default
-    function displayMovies(list) {
-      grid.innerHTML = "";
-      list.forEach(movie => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
-        card.innerHTML = `
-          <img src="${movie.img}" alt="${movie.title}">
-          <h3>${movie.title}</h3>
-          <p>${movie.genre}</p>
-        `;
-        grid.appendChild(card);
+    // === UI helpers ===
+    const genresEl = document.getElementById('genres');
+    const gridEl = document.getElementById('grid');
+    const searchEl = document.getElementById('search');
+    const categoryEl = document.getElementById('categoryFilter');
+
+    let activeGenre = 'all';
+
+    function renderGenres(){
+      const frag = document.createDocumentFragment();
+      const allBtn = document.createElement('button');
+      allBtn.className='genre active'; allBtn.textContent='All'; allBtn.dataset.genre='all';
+      frag.appendChild(allBtn);
+      allGenres.forEach(g=>{
+        const b=document.createElement('button');b.className='genre';b.textContent=g;b.dataset.genre=g;frag.appendChild(b);
+      });
+      genresEl.innerHTML='';genresEl.appendChild(frag);
+      genresEl.addEventListener('click',e=>{
+        const btn=e.target.closest('.genre'); if(!btn) return;
+        Array.from(genresEl.querySelectorAll('.genre')).forEach(x=>x.classList.remove('active'));
+        btn.classList.add('active');
+        activeGenre = btn.dataset.genre;
+        renderGrid();
       });
     }
 
-    function searchMovies() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = movies.filter(movie =>
-        movie.title.toLowerCase().includes(query) ||
-        movie.genre.toLowerCase().includes(query)
-      );
-      displayMovies(filtered.length ? filtered : movies);
+    function createCard(movie){
+      const card=document.createElement('article');card.className='card';
+      card.innerHTML = `
+        <img class="poster" loading="lazy" src="${movie.img}" alt="${movie.title} poster" />
+        <div class="meta">
+          <h3 class="title">${movie.title} <span style="font-weight:400;color:#88b0cf">(${movie.year})</span></h3>
+          <p class="sub">${movie.genres.join(' • ')}</p>
+        </div>
+      `;
+      card.addEventListener('click',()=> openModal(movie));
+      return card;
     }
 
-    // Initial display
-    displayMovies(movies);
+    function renderGrid(){
+      const q = searchEl.value.trim().toLowerCase();
+      const category = categoryEl.value;
+      const filtered = movies.filter(m=>{
+        if(activeGenre!=='all' && !m.genres.includes(activeGenre)) return false;
+        if(category!=='all' && m.category!==category) return false;
+        if(!q) return true;
+        return [m.title,m.desc,m.genres.join(' '),m.year].join(' ').toLowerCase().includes(q);
+      });
+      gridEl.innerHTML='';
+      if(filtered.length===0){gridEl.innerHTML='<p style="color:#acc9e6">No movies found. Try another search or category.</p>';return}
+      const frag=document.createDocumentFragment();
+      filtered.forEach(m=>frag.appendChild(createCard(m)));
+      gridEl.appendChild(frag);
+    }
+
+    // Modal logic
+    function openModal(movie){
+      const tpl = document.getElementById('modalT');
+      const node = tpl.content.cloneNode(true);
+      node.querySelector('img').src = movie.img;
+      node.querySelector('h2').textContent = movie.title + ' ('+movie.year +')';
+      node.querySelector('.sub').textContent = movie.genres.join(' • ') + ' — ' + (movie.category || 'general');
+      node.querySelector('.desc').textContent = movie.desc;
+      const back = node.querySelector('.modal-back');
+      back.addEventListener('click', (e)=>{ if(e.target===back) closeModal(back) });
+      node.querySelector('.close-btn').addEventListener('click', ()=> closeModal(back));
+      document.body.appendChild(back);
+    }
+    function closeModal(back){ if(back && back.remove) back.remove(); }
+
+    // Init
+    renderGenres();renderGrid();
+
+    // Events
+    searchEl.addEventListener('input', ()=> renderGrid());
+    categoryEl.addEventListener('change', ()=> renderGrid());
+
+    // accessibility: keyboard close
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ const b=document.querySelector('.modal-back'); if(b) b.remove(); } });
+
   </script>
 </body>
 </html>
